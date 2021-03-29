@@ -4,14 +4,14 @@ from saveData import BotData
 '''
 TODO:
 login to instagram 
-go to users profile
+go to profiles profile
 click to message 
 send messages from file
 '''
 data = BotData()
-data.getAccounts()
-# bot = Bot('cricetonzi', 'S4muele2002')
-# bot.open()
-# bot.doLogin()
-# bot.goToProfileSendMessage('_biancas7asi_', 'Ciao, sono una UBoat')
-# # bot.searchHashtag('personaltrainerita')
+bot = Bot('cricetonzi', 'S4muele2002', data)
+bot.open()
+bot.doLogin()
+bot.searchUser('tatuaggi_ita_')
+bot.addFollowedToList()
+bot.close()
