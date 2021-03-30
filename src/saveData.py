@@ -28,4 +28,3 @@ class BotData:
 	def getAccounts(self):
 		# print(self.search["accounts"])
 		return self.found["accounts"]
-			

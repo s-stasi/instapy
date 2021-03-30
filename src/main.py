@@ -3,6 +3,14 @@ from saveData import BotData
 from threading import Thread
 import time
 import sys
+import argparse
+
+parser = argparse.ArgumentParser(description='Instagram bot')
+parser.add_argument('listnum', metavar='-l', type=int, nargs='+',help='Numero di persone da mettere in lista')
+parser.add_argument('messnum', metavar='-m', type=int, nargs='+', help='Numero di persone da messaggiare')
+
+args = parser.parse_args()
+print(args.accumulate(args.integers))
 
 if len(sys.argv) == 1:
 	pass
@@ -73,18 +81,19 @@ elif 'gui' in sys.argv:
 
 		pygame.display.update()
 
-data = BotData()
-bot = Bot('cricetonzi', 'S4muele2002', data)
-bot.open()
-bot.doLogin()
+# data = BotData()
+# bot = Bot('cricetonzi', 'S4muele2002', data)
+# bot.open()
+# bot.doLogin()
 
-if 'list' in sys.argv :
-	bot.searchUser("tatuaggi_ita_")
-	bot.addFollowersToList()
+# if 'list' in sys.argv:
+# 	bot.searchUser("tatuaggi_ita_")
+# 	bot.addFollowersToList()
 
-if 'message' in sys.argv:
-	bot.goToDirect()
-	for i in data.getAccounts():
-		bot .sendMessage(i, "")
+# if 'message' in sys.argv:
+# 	bot.goToDirect()
+# 	if sys.argv[1] == "--l":
+# 	for i in data.getAccounts():
+# 		bot .sendMessage(i, "")
 
-bot.close()
+# bot.close()
