@@ -13,14 +13,15 @@ class BotData:
 		self.__appendToFile(account)
 
 	def __appendToFile(self, account):
-		self.found["accounts"].append(account)
-		self.found_accounts_file.seek(0)
-		json.dump(self.found, self.found_accounts_file)
+		if account not in self.found["accounts"]:
+			self.found["accounts"].append(account)
+			self.found_accounts_file.seek(0)
+			json.dump(self.found, self.found_accounts_file)
 
 	def saveToFile(self):
 		json.dump(self.data, self.file)
 
 	def getAccounts(self):
 		# print(self.search["accounts"])
-		return self.search["accounts"]
+		return self.found["accounts"]
 			

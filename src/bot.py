@@ -2,8 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from getpass import getpass
 from saveData import BotData
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
@@ -17,6 +15,7 @@ class Bot:
 	totalFound = 0
 
 	def __init__(self, username: str, password: str, data: BotData):
+		print('initialize bot')
 		self.username = username
 		self.password = password
 		self.data  = data
@@ -55,29 +54,31 @@ class Bot:
 		self.driver.get(self.url)
 		self.__handleNotificationRequest()
 
-	def SendMessage(self, username: str, message: str):
-		self.reciever_url = self.custom_url.format(username = username)
+	def goToDirect(self):
 		self.driver.get("https://www.instagram.com/direct/inbox")
 		self.driver.find_element_by_xpath("//body/div[4]/div/div/div/div[3]/button[2]").click()
 		self.driver.find_element_by_xpath("//body").click()
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section/div[1]/header/div[1]/div[2]/button").click()
 
+	def sendMessage(self, username: str, message: str):
 		search_box = self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[1]/div[2]/input[1]")
 		search_box.click()
 		search_box.send_keys(username)
-		time.sleep(1)
+		time.sleep(2.5)
 		# click profile
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[3]/button[1]").click()
 		time.sleep(1)
 		# click "avanti"
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[1]/header/div/div[2]/button").click()
-		time.sleep(0.7)
+		time.sleep(2)
 		# click textarea
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/textarea[1]").click()
 
 		if message != "":
 			self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/textarea[1]").send_keys(message)
 			self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/button[1]").click()
+		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[1]/header[1]/div[1]/div[1]").click()
+		time.sleep(0.5)
 
 	def scrollDown(self):
 		last_height = self.driver.execute_script("return document.body.scrollHeight")
@@ -107,6 +108,23 @@ class Bot:
 	def addFollowedToList(self):
 		# click "seguiti"
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/main[1]/div[1]/ul[1]/li[3]/a[1]/span[1]").click()
+		# add account to list
+
+		self.scrollDown()
+
+		WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, 'a.notranslate')))
+		list_of_elements = self.driver.find_elements_by_css_selector('a.notranslate')
+		print(list_of_elements)
+		for i in list_of_elements:
+			self.totalFound += 1
+			print (i.text)
+			self.data.addFound(i.text)
+
+		print('found {count} new accounts'.format(count = self.totalFound))
+
+	def addFollowersToList(self):
+		# click "seguiti"
+		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/main[1]/div[1]/ul[1]/li[2]/a[1]/span[1]").click()
 		# add account to list
 
 		self.scrollDown()
