@@ -6,7 +6,7 @@ import sys
 
 if len(sys.argv) == 1:
 	pass
-elif sys.argv[1] == 'gui':
+elif 'gui' in sys.argv:
 	import pygame
 	import pygame_gui
 
@@ -77,6 +77,14 @@ data = BotData()
 bot = Bot('cricetonzi', 'S4muele2002', data)
 bot.open()
 bot.doLogin()
-bot.searchUser("tatuaggi_ita_")
-bot.addFollowersToList()
+
+if 'list' in sys.argv :
+	bot.searchUser("tatuaggi_ita_")
+	bot.addFollowersToList()
+
+if 'message' in sys.argv:
+	bot.goToDirect()
+	for i in data.getAccounts():
+		bot .sendMessage(i, "")
+
 bot.close()

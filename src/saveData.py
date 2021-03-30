@@ -19,7 +19,11 @@ class BotData:
 			json.dump(self.found, self.found_accounts_file)
 
 	def saveToFile(self):
-		json.dump(self.data, self.file)
+		json.dump(self.data, self.found_accounts_file)
+
+	def makeDone(self, count):
+		self.done["done"].append(self.found["accounts"][count])
+		self.found["accounts"].pop(count)
 
 	def getAccounts(self):
 		# print(self.search["accounts"])
