@@ -19,6 +19,7 @@ class Bot:
 		self.username = username
 		self.password = password
 		self.data  = data
+		self.exec_time = time.time()
 
 	def open(self):
 		mobile_emulation = { "deviceName": "Nexus 5" }
@@ -61,16 +62,22 @@ class Bot:
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section/div[1]/header/div[1]/div[2]/button").click()
 
 	def sendMessage(self, username: str, message: str):
+		lclock = time.time()
 		search_box = self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[1]/div[2]/input[1]")
 		search_box.click()
 		search_box.send_keys(username)
 		time.sleep(2.5)
 		# click profile
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[3]/button[1]").click()
-		time.sleep(1)
+		
 		# click "avanti"
+		WebBrowserWait(self.driver, 5).until(EC.element_to_be_clickable(By.XPATH, "//*[@id='react-root']/section[1]/div[1]/header/div/div[2]/button"))
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[1]/header/div/div[2]/button").click()
-		time.sleep(2)
+
+		self.exec_time = (time.time() - self.start_time)/60
+		if self.exec_time % 20 == 0: time.sleep(60)
+		if self.exec_time % 120 == 0: time.sleep(60 * 17)
+		else: time.sleep(random.uniform(4.0, 7.5))
 		# click textarea
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/textarea[1]").click()
 
@@ -78,7 +85,10 @@ class Bot:
 			self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/textarea[1]").send_keys(message)
 			self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/button[1]").click()
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[1]/header[1]/div[1]/div[1]").click()
+
+		self.data.makeDone(username)
 		time.sleep(0.5)
+		print('This user took about: ' + (time.time() - lclock))
 
 	def scrollDown(self):
 		last_height = self.driver.execute_script("return document.body.scrollHeight")

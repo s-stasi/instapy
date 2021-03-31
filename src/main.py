@@ -5,15 +5,12 @@ import time
 import sys
 import argparse
 
-parser = argparse.ArgumentParser(description='Instagram bot')
-parser.add_argument('listnum', metavar='-l', type=int, nargs='+',help='Numero di persone da mettere in lista')
-parser.add_argument('messnum', metavar='-m', type=int, nargs='+', help='Numero di persone da messaggiare')
-
-args = parser.parse_args()
-print(args.accumulate(args.integers))
+# parser = argparse.ArgumentParser(name='instabot')
+# parser.add_argument('--list', '-l', nargs='?', help='Avvia il bot per creare la lista')
+# parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
 if len(sys.argv) == 1:
-	pass
+	exit()
 elif 'gui' in sys.argv:
 	import pygame
 	import pygame_gui
@@ -81,19 +78,27 @@ elif 'gui' in sys.argv:
 
 		pygame.display.update()
 
-# data = BotData()
-# bot = Bot('cricetonzi', 'S4muele2002', data)
-# bot.open()
-# bot.doLogin()
+data = BotData()
+bot = Bot('cricetonzi', 'S4muele2002', data)
+bot.open()
+bot.doLogin()
 
-# if 'list' in sys.argv:
-# 	bot.searchUser("tatuaggi_ita_")
-# 	bot.addFollowersToList()
+if 'list' in sys.argv:
+	# for i in data.getTags():
+	# 	bot.searchUser("tatuaggi_ita_")
+	# 	bot.addFollowersToList()
+	for i in data.getAccList():
+		bot.searchUser("tatuaggi_ita_")
+		print('Adding Followed to list ...')
+		bot.addFollowersToList()
+		print('Done')
+		print('Adding followers to list ...')
+		bot.addFollowedToList()
+		print('Done')
 
-# if 'message' in sys.argv:
-# 	bot.goToDirect()
-# 	if sys.argv[1] == "--l":
-# 	for i in data.getAccounts():
-# 		bot .sendMessage(i, "")
+if 'message' in sys.argv:
+	bot.goToDirect()
+	for i in data.getAccounts():
+		bot .sendMessage(i, "")
 
-# bot.close()
+bot.close()
