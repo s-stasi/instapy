@@ -28,7 +28,8 @@ class BotData:
 	def getTags(self):
 		return self.search["tags"]
 
-	def getAccList
+	def getAccList():
+		return 0
 
 	def getAccounts(self):
 		# print(self.search["accounts"])

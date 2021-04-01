@@ -3,7 +3,7 @@ from saveData import BotData
 from threading import Thread
 import time
 import sys
-import argparse
+# import argparse
 
 # parser = argparse.ArgumentParser(name='instabot')
 # parser.add_argument('--list', '-l', nargs='?', help='Avvia il bot per creare la lista')
@@ -99,6 +99,7 @@ if 'list' in sys.argv:
 if 'message' in sys.argv:
 	bot.goToDirect()
 	for i in data.getAccounts():
-		bot .sendMessage(i, "")
+		#bot .sendMessage(i, "")
+		pass
 
 bot.close()
