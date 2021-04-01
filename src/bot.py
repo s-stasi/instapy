@@ -72,6 +72,7 @@ class Bot:
 		
 		# click "avanti"
 		WebBrowserWait(self.driver, 5).until(EC.element_to_be_clickable(By.XPATH, "//*[@id='react-root']/section[1]/div[1]/header/div/div[2]/button"))
+		
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/div[1]/header/div/div[2]/button").click()
 
 		self.exec_time = (time.time() - self.start_time)/60
