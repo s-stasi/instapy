@@ -16,7 +16,7 @@ class Bot {
     this.password = password;
   }
 
-  async open() {
+  async open(): Promise<void> {
     const browser = await puppeteer.launch({ headless: false });
     this.page = await browser.newPage();
     await this.page.emulate(this.iPhone);
@@ -24,7 +24,7 @@ class Bot {
     console.log(await this.page.title());
   }
 
-  private async acceptCookies() {
+  private async acceptCookies(): Promise<void> {
     var [accept] = await this.page.$x('//body/div[2]/div[1]/div[1]/div[1]/div[2]/button[1]')
     if (accept) {
       await accept.tap()
@@ -32,15 +32,15 @@ class Bot {
     else console.error('Failed to click accept cookie button')
   }
 
-  private async clickAccedi() {
+  private async clickAccedi(): Promise<void> {
       var [accedi] = await this.page.$x('//*[@id=\'react-root\']/section[1]/main[1]/article[1]/div[1]/div[1]/div[1]/div[2]/button[1]')
       if (accedi) {
         await accedi.tap()
       }
       else console.error('Failed to click accedi button')
-    }
+  }
 
-  private async handleNotificationRequest() {
+  private async handleNotificationRequest(): Promise<void> {
 		var [not_now_button] = await this.page.$x('//body/div[4]/div/div/div/div[3]/button[2]')
     if (not_now_button) {
       await not_now_button.tap()
@@ -48,7 +48,7 @@ class Bot {
     else console.error('Failed to click not now notification button')
   }
 
-  private async saveAccessInfo() {
+  private async saveAccessInfo(): Promise<void> {
 		var [not_now_button] = await this.page.$x('/html/body/div[1]/section/main/div[1]/div[1]/div[1]/button[1]')
     if (not_now_button) {
       await not_now_button.tap()
@@ -56,7 +56,7 @@ class Bot {
     else console.error('Failed to click not now save info button')
   }
 
-  private async clickBody() {
+  private async clickBody(): Promise<void> {
 		var [body] = await this.page.$x('//*[@id=\'react-root\']/section[1]/div[2]/div[1]/div[1]')
     if (body) {
       await body.tap()
@@ -64,7 +64,7 @@ class Bot {
     else console.error('Failed to click body')
   }
 
-  async doLogin() {
+  async doLogin(): Promise<void> {
     await this.acceptCookies();
     await this.clickAccedi();
     await this.page.waitForSelector("[name='username']");
@@ -82,13 +82,13 @@ class Bot {
     
   }
   
-  async goToDirect() {
+  async goToDirect(): Promise<void> {
     await this.page.goto('https://www.instagram.com/direct/inbox');
     await this.handleNotificationRequest();
     await this.clickBody();
   }
   
-  async sendMessage(username: string, message: string ) {
+  async sendMessage(username: string, message: string ): Promise<void> {
     const lclock: number = Date.now();
     // type on search box
     await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/div[2]/div[1]/div[1]/div[1]/div[2]/input[1]');
@@ -121,6 +121,94 @@ class Bot {
     console.log(`This user took about ${Date.now() - this.start_time}`);
   }
 
+  async scrollDown(): Promise<void> {
+    var last_height = await this.page.evaluate(() => {
+      return document.body.scrollHeight;
+    });
+
+    while (true) {
+      var time = Date.now();
+      while (true) {
+        if (last_height <= await this.page.evaluate(() => {return document.body.scrollHeight;})) break;
+        if ((Date.now() - time) >= 20 * 1000) return;
+      }
+
+      await this.page.evaluate(() => { window.scrollTo(0, document.body.scrollHeight)});
+      await setTimeout(() => true, (Math.floor(Math.random() * (1.65 - 0.58 + 1)) + 0.58) * 1000);
+    }
+  }
+
+  async searchHashtag(hashtag: string): Promise<void> {
+    const hashtag_url = this.intagram_url + 'explore/tags/' + hashtag;
+    await this.page.goto(hashtag_url);
+  }
+
+  async searchUser(username: string): Promise<void> {
+    const username_url = this.intagram_url + username;
+    await this.page.goto(username_url)
+  }
+
+  async getFollowedNumber(): Promise<number> { 
+    var followed = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/div[1]/ul[1]/li[3]/a[1]/span[1]');
+    if(followed) return parseInt(await this.page.evaluate(el => el.textContent, followed))
+    else console.error('Unable to get followed number')
+  }
+
+  async getFollowersNumber(): Promise<number> { 
+    var followed = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/div[1]/ul[1]/li[2]/a[1]/span[1]');
+    if(followed) return parseInt(await this.page.evaluate(el => el.textContent, followed))
+    else console.error('Unable to get followers number')
+  }
+
+  async getFollowersList(): Promise<Array<string>> {
+    var count: number = 0;
+    var str_list: Array<string>;
+    var followers_button = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/div[1]/ul[1]/li[2]/a[1]/span[1]');
+    if(followers_button) await followers_button.tap();
+    else console.error('Unable to click followers button')
+
+    await setTimeout(async () => {
+      await this.scrollDown();
+    }, 6 * 1000);
+
+    var list = await this.page.$$('a .notranslate');
+    for(var i of list ){
+      count ++;
+      const username = await this.page.evaluate(el => el.textContent, i);
+      str_list.push(username)
+      console.log('Username: ' + username);
+    }
+
+    console.log('Found ' + count.toString() + 'accounts');
+    return str_list;
+  }
+
+  async getFollowedList(): Promise<Array<string>> {
+    var count: number = 0;
+    var str_list: Array<string>;
+    var followers_button = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/div[1]/ul[1]/li[3]/a[1]/span[1]');
+    if(followers_button) await followers_button.tap();
+    else console.error('Unable to click followed button')
+
+    await setTimeout(async () => {
+      await this.scrollDown();
+    }, 6 * 1000);
+
+    var list = await this.page.$$('a .notranslate');
+    for(var i of list ){
+      count ++;
+      const username = await this.page.evaluate(el => el.textContent, i);
+      str_list.push(username)
+      console.log('Username: ' + username);
+    }
+
+    console.log('Found ' + count.toString() + 'accounts');
+    return str_list;
+  }
+
+  async close(): Promise<void> {
+    await this.page.close();
+  }
 }
 
 
