@@ -1,19 +1,20 @@
 import json
+import pathlib
 
 class BotData:
 
 	def __init__(self):
-		with open('./data/found_accounts.json', 'r+') as found_accounts_file:
+		with open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\found_accounts.json', 'r+') as found_accounts_file:
 			self.found = json.load(found_accounts_file)
 
-		with open('./data/tags_and_accounts.json', 'r+') as search_keywords:
+		with open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\tags_and_accounts.json', 'r+') as search_keywords:
 			self.search = json.load(search_keywords)
 
 	def addFound(self, account):
 		self.__appendToFile(account)
 
 	def __appendToFile(self, username):
-		ww = open('./data/found_accounts.json', 'w')
+		ww = open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\found_accounts.json', 'w')
 		if username not in self.found["accounts"]:
 			self.found["accounts"].append(username)
 			ww.seek(0)

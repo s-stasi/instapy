@@ -9,9 +9,10 @@ import time
 from conditions import condition
 import random
 from explicit import waiter, XPATH
+import itertools
 
 class Bot:
-	PATH = './bin/chromedriverdev.exe'
+	PATH = './bin/chromedriver.exe'
 	url = 'https://instagram.com'
 	custom_url = 'https://www.instagram.com/{username}/'
 	data: BotData
@@ -97,7 +98,7 @@ class Bot:
 		time.sleep(0.5)
 		print('This user took about: ' + (time.time() - lclock))
 
-	def scrape_followers(driver):
+	def scrape_followers(self):
     # Load account page
 
     # Click the 'Follower(s)' link
@@ -125,8 +126,8 @@ class Bot:
         # potentially be large amount of time between that call and this one,
         # and the element might have gone stale. Lets just re-acquire it to avoid
         # that
-				last_follower = waiter.find_element(driver, follower_css.format(follower_index))
-				driver.execute_script("arguments[0].scrollIntoView();", last_follower)
+				last_follower = waiter.find_element(self.driver, follower_css.format(follower_index))
+				self.driver.execute_script("arguments[0].scrollIntoView();", last_follower)
 
 	def searchHashtag(self, hashtag: str):
 		custom_url = self.url + '/explore/tags/{tag}'
@@ -176,9 +177,8 @@ class Bot:
 			self.data.addFound(i.text)
 
 		print('found {count} new accounts'.format(count = self.totalFound)) """
-
-	def checkUserFollowers(self, account):
-		pass
+		def checkUserFollowers(self, account):
+			pass
 
 
 	def close(self):
