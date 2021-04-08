@@ -87,7 +87,7 @@ bot.open()
 bot.doLogin()
 
 if 'list' in sys.argv:
-	bot.searchUser("tatuaggi_ita_")
+	bot.searchUser("crescitafollowerapida")
 	bot.addFollowersToList()
 
 if 'message' in sys.argv:

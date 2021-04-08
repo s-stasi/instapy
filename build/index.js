@@ -39,52 +39,41 @@ exports.__esModule = true;
 var bot_1 = require("./bot");
 var data_1 = require("./data");
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var bot, data, _i, _a, i, list, _b, _c, el;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var bot, data, _i, _a, i, list, el;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 bot = new bot_1["default"]('my_agency_ita', 'FabioDodii123');
                 return [4 /*yield*/, bot.open()];
             case 1:
-                _d.sent();
+                _b.sent();
                 return [4 /*yield*/, bot.doLogin()];
             case 2:
-                _d.sent();
+                _b.sent();
                 data = new data_1["default"]('my_agency_ita', 'FabioDodii123');
                 _i = 0, _a = data.getList();
-                _d.label = 3;
+                _b.label = 3;
             case 3:
-                if (!(_i < _a.length)) return [3 /*break*/, 11];
+                if (!(_i < _a.length)) return [3 /*break*/, 7];
                 i = _a[_i];
                 console.log(i);
                 return [4 /*yield*/, bot.searchUser(i)];
             case 4:
-                _d.sent();
+                _b.sent();
                 return [4 /*yield*/, bot.getFollowedList()];
             case 5:
-                list = _d.sent();
+                list = _b.sent();
                 console.log(list);
-                _b = 0;
-                return [4 /*yield*/, list];
-            case 6:
-                _c = _d.sent();
-                _d.label = 7;
-            case 7:
-                if (!(_b < _c.length)) return [3 /*break*/, 9];
-                el = _c[_b];
-                console.log(el);
-                data.addFound(el);
-                _d.label = 8;
-            case 8:
-                _b++;
-                return [3 /*break*/, 7];
-            case 9:
+                for (el = 0; el = list.length; el++) {
+                    console.log(list[el]);
+                    data.addFound(list[el]);
+                }
                 data.save();
-                _d.label = 10;
-            case 10:
+                _b.label = 6;
+            case 6:
                 _i++;
                 return [3 /*break*/, 3];
-            case 11: return [2 /*return*/];
+            case 7: return [2 /*return*/];
         }
     });
 }); })();

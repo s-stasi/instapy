@@ -509,7 +509,7 @@ var Bot = /** @class */ (function () {
     };
     Bot.prototype.getFollowedList = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var count, str_list, followers_button, list, obj_list, _i, list_2, i, username;
+            var count, str_list, followers_button, list, obj_list, i, name;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -537,33 +537,31 @@ var Bot = /** @class */ (function () {
                     case 6:
                         _a.sent();
                         console.log('done');
-                        return [4 /*yield*/, this.page.$$('a .notranslate')];
+                        return [4 /*yield*/, this.page.$$('li')];
                     case 7:
                         list = _a.sent();
                         console.log(list);
-                        obj_list = { list: str_list, length: count };
-                        console.log(obj_list);
-                        _i = 0, list_2 = list;
+                        obj_list = { list: list, length: list.length };
+                        console.log(obj_list.list.length);
+                        i = 0;
                         _a.label = 8;
                     case 8:
-                        if (!(_i < list_2.length)) return [3 /*break*/, 11];
-                        i = list_2[_i];
+                        if (!(i < obj_list.length)) return [3 /*break*/, 11];
+                        return [4 /*yield*/, obj_list.list[i].$eval('div div div div a', function (node) { return node.textContent; })];
+                    case 9:
+                        name = _a.sent();
                         count++;
                         console.log('here');
-                        return [4 /*yield*/, this.page.evaluate(function (el) { return el.textContent; }, i)];
-                    case 9:
-                        username = _a.sent();
-                        str_list.push(username);
+                        str_list.list.push(name);
                         console.log(str_list);
-                        obj_list = { list: str_list, length: count };
-                        console.log('Username: ' + username);
+                        console.log('Username: ' + name);
                         _a.label = 10;
                     case 10:
-                        _i++;
+                        i++;
                         return [3 /*break*/, 8];
                     case 11:
                         console.log('Found ' + count.toString() + ' accounts');
-                        return [2 /*return*/, obj_list.list];
+                        return [2 /*return*/, str_list.list];
                 }
             });
         });

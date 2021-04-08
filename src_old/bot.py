@@ -1,16 +1,17 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from getpass import getpass
-from .saveData import BotData
+from saveData import BotData
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 import time
-from .conditions import condition
+from conditions import condition
 import random
+from explicit import waiter, XPATH
 
 class Bot:
-	PATH = './src/chromedriver.exe'
+	PATH = './bin/chromedriverdev.exe'
 	url = 'https://instagram.com'
 	custom_url = 'https://www.instagram.com/{username}/'
 	data: BotData
@@ -96,24 +97,36 @@ class Bot:
 		time.sleep(0.5)
 		print('This user took about: ' + (time.time() - lclock))
 
-	def scrollDown(self):
-		# last_height = self.driver.execute_script("return document.body.scrollHeight")
+	def scrape_followers(driver):
+    # Load account page
 
-		while True:
-				# Scroll down to bottom
-				self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # Click the 'Follower(s)' link
+    # driver.find_element_by_partial_link_text("follower").click()
 
-				# Wait to load page
-				WebDriverWait(self.driver, 10).until(conditions.condition)
-				if time.time() - self.time_start > (20 * 60): break
+    # Wait for the followers modal to load
+		#waiter.find_element(self.driver, "//div[@role='dialog']", by=XPATH)
 
-				time.sleep(random.uniform(1.0, 2.75))
+    # At this point a Followers modal pops open. If you immediately scroll to the bottom,
+    # you hit a stopping point and a "See All Suggestions" link. If you fiddle with the
+    # model by scrolling up and down, you can force it to load additional followers for
+    # that person.
 
-				# Calculate new scroll height and compare with last scroll height
-				# new_height = self.driver.execute_script("return document.body.scrollHeight")
-				# if new_height == last_height:
-				# 	break
-				# last_height = new_height
+    # Now the modal will begin loading followers every time you scroll to the bottom.
+    # Keep scrolling in a loop until you've hit the desired number of followers.
+    # In this instance, I'm using a generator to return followers one-by-one
+		follower_css = "ul div li:nth-child({}) a.notranslate"  # Taking advange of CSS's nth-child functionality
+		for group in itertools.count(start=1, step=12):
+			for follower_index in range(group, group + 12):
+				self.data.addFound(waiter.find_element(self.driver, follower_css.format(follower_index)).text)
+
+        # Instagram loads followers 12 at a time. Find the last follower element
+        # and scroll it into view, forcing instagram to load another 12
+        # Even though we just found this elem in the previous for loop, there can
+        # potentially be large amount of time between that call and this one,
+        # and the element might have gone stale. Lets just re-acquire it to avoid
+        # that
+				last_follower = waiter.find_element(driver, follower_css.format(follower_index))
+				driver.execute_script("arguments[0].scrollIntoView();", last_follower)
 
 	def searchHashtag(self, hashtag: str):
 		custom_url = self.url + '/explore/tags/{tag}'
@@ -152,9 +165,9 @@ class Bot:
 		self.driver.find_element_by_xpath("//*[@id='react-root']/section[1]/main[1]/div[1]/ul[1]/li[2]/a[1]/span[1]").click()
 		# add account to list
 
-		self.scrollDown()
+		self.scrape_followers()
 
-		WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, 'a.notranslate')))
+		""" WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, 'a.notranslate')))
 		list_of_elements = self.driver.find_elements_by_css_selector('a.notranslate')
 		print(list_of_elements)
 		for i in list_of_elements:
@@ -162,7 +175,7 @@ class Bot:
 			print (i.text)
 			self.data.addFound(i.text)
 
-		print('found {count} new accounts'.format(count = self.totalFound))
+		print('found {count} new accounts'.format(count = self.totalFound)) """
 
 	def checkUserFollowers(self, account):
 		pass

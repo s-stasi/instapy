@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import { WorkerPool } from 'workerpool';
 import Bot from './bot';
 
 interface account {
@@ -13,20 +12,22 @@ interface files {
   accounts: Array<account>;
 };
 
-
 class BotData {
   found_accounts: files;
-  tags_and_accounts: files;
+  tags_and_accounts: {accounts: Array<string>};
   username: string;
   password: string;
 
-
-
   constructor(username: string, password: string) {
-    this.found_accounts = (fs.openSync('../data/found_accounts.json', 'w+').toString()) ? JSON.parse(fs.openSync('../data/found_accounts.json', 'w+').toString()) : {accounts: []as account[]};
-    this.found_accounts = (fs.openSync('../data/tags_and_accounts.json', 'w+').toString()) ? JSON.parse(fs.openSync('../data/tags_and_accounts.json', 'w+').toString()) :{accounts: []as account[]};
+    console.log(fs.readFileSync('./data/tags_and_accounts.json'))
+    this.found_accounts = (fs.readFileSync('./data/found_accounts.json')) ? JSON.parse(fs.readFileSync('./data/found_accounts.json').toString()) : {accounts: []as account[]};
+    this.tags_and_accounts = (fs.readFileSync('./data/tags_and_accounts.json')) ? JSON.parse(fs.readFileSync('./data/tags_and_accounts.json').toString()) :{accounts: []};
     this.username = username;
     this.password = password;
+  }
+
+  getList(): Array<string> {
+    return this.tags_and_accounts.accounts;
   }
 
   private async checkAccount(username: string): Promise<account>{
@@ -44,8 +45,8 @@ class BotData {
     return account
   }
 
-  addFound(username: string) {
-    var isIn:boolean = false;
+  async addFound(username: string) {
+    var isIn: boolean = false;
     this.checkAccount(username)
     .then((acc) => {
       for (const i of this.found_accounts.accounts) {
@@ -58,7 +59,9 @@ class BotData {
     });
   }
 
-
+  async save(): Promise<void> {
+    fs.writeFileSync('./data/found_accounts.json', JSON.stringify(this.found_accounts));
+  }
 }
 
 export {

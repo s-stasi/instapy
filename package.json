@@ -2,11 +2,12 @@
   "name": "instabot",
   "version": "1.0.0",
   "description": "Bot to make money $ ;)",
-  "main": "src/index.ts",
+  "main": "build/index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
     "dev": "nodemon src/index.ts",
-    "test": "nodemon src/index.ts"
+    "test": "nodemon src/index.ts",
+    "py": "py src_old/main.py list"
   },
   "repository": {
     "type": "git",

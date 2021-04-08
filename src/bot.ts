@@ -33,11 +33,12 @@ class Bot {
   }
 
   private async clickAccedi(): Promise<void> {
-      var [accedi] = await this.page.$x('//*[@id=\'react-root\']/section[1]/main[1]/article[1]/div[1]/div[1]/div[1]/div[2]/button[1]')
-      if (accedi) {
-        await accedi.tap()
-      }
-      else console.error('Failed to click accedi button')
+    var accedi = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/article[1]/div[1]/div[1]/div[1]/div[2]/button[1]', {
+      timeout: 4000,
+      visible: true
+    });
+    if(accedi) return await accedi.tap();
+    else console.error('Unable to click accedi button')
   }
 
   private async handleNotificationRequest(): Promise<void> {
@@ -122,6 +123,7 @@ class Bot {
   }
 
   async scrollDown(): Promise<void> {
+    console.log('scrolldown');
     var last_height = await this.page.evaluate(() => {
       return document.body.scrollHeight;
     });
@@ -129,12 +131,16 @@ class Bot {
     while (true) {
       var time = Date.now();
       while (true) {
-        if (last_height <= await this.page.evaluate(() => {return document.body.scrollHeight;})) break;
-        if ((Date.now() - time) >= 20 * 1000) return;
+        if (last_height < await this.page.evaluate(() => {return document.body.scrollHeight;})) {
+          last_height = await this.page.evaluate(() => {return document.body.scrollHeight;});
+          break;
+        }
+        if ((Date.now() - time) > 20 * 1000) return;
       }
 
       await this.page.evaluate(() => { window.scrollTo(0, document.body.scrollHeight)});
       await setTimeout(() => true, (Math.floor(Math.random() * (1.65 - 0.58 + 1)) + 0.58) * 1000);
+      console.log('scrolling');
     }
   }
 
@@ -185,25 +191,36 @@ class Bot {
 
   async getFollowedList(): Promise<Array<string>> {
     var count: number = 0;
-    var str_list: Array<string>;
+    var str_list: {list: string[], length: 0};
     var followers_button = await this.page.waitForXPath('//*[@id=\'react-root\']/section[1]/main[1]/div[1]/ul[1]/li[3]/a[1]/span[1]');
     if(followers_button) await followers_button.tap();
     else console.error('Unable to click followed button')
+    console.log('clicked followed button');
 
-    await setTimeout(async () => {
-      await this.scrollDown();
-    }, 6 * 1000);
+    console.log('strarting timeout of 6 sec');
+    await setTimeout(() => {}, 6 * 1000);
+    console.log('finished timeout');
+    console.log('scrolling..');
+    await this.scrollDown();
+    console.log('done');
 
-    var list = await this.page.$$('a .notranslate');
-    for(var i of list ){
+    var list = await this.page.$$('li');
+    console.log(list)
+    var obj_list = { list: list, length: list.length}
+    console.log(obj_list.list.length);
+
+
+    for(var i = 0; i < obj_list.length; i++ ){
+      var name = await obj_list.list[i].$eval('a.FPmhX', node => node.textContent);
       count ++;
-      const username = await this.page.evaluate(el => el.textContent, i);
-      str_list.push(username)
-      console.log('Username: ' + username);
+      console.log('here');
+      str_list.list.push(name)
+      console.log(str_list);
+      console.log('Username: ' + name);
     }
 
-    console.log('Found ' + count.toString() + 'accounts');
-    return str_list;
+    console.log('Found ' + count.toString() + ' accounts');
+    return str_list.list;
   }
 
   async close(): Promise<void> {
