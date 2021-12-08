@@ -3,5 +3,10 @@
     {
       "path": "."
     }
-  ]
+  ],
+  "settings": {
+    "editor.autoIndent": "full",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2,
+  }
 }

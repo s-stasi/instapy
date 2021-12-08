@@ -1,39 +1,45 @@
-import json
-import pathlib
+from threading import Lock
+import os
+class Singleton(type):
+  _instances = {}
+  _lock: Lock = Lock()
+  
+  def __call__(cls,*args, **kwargs):
+    with cls._lock:
+      if cls not in cls._instances:
+        instance = super().__call__(*args, **kwargs)
+        cls._instances[cls] = instance
+    return cls._instances[cls]
 
-class BotData:
-
+class BotData(metaclass = Singleton):
+	foundAccounts = []
+	searchAccounts = []
+  
 	def __init__(self):
-		with open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\found_accounts.json', 'r+') as found_accounts_file:
-			self.found = json.load(found_accounts_file)
-
-		with open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\tags_and_accounts.json', 'r+') as search_keywords:
-			self.search = json.load(search_keywords)
-
-	def addFound(self, account):
-		self.__appendToFile(account)
-
-	def __appendToFile(self, username):
-		ww = open(str(pathlib.Path().parent.parent.absolute()) + '\\data\\found_accounts.json', 'w')
-		if username not in self.found["accounts"]:
-			self.found["accounts"].append(username)
-			ww.seek(0)
-			json.dump(self.found, ww)
-
-	def saveToFile(self, fstream):
-		# json.dump(self.data, self.found_accounts_file)
-		pass
-
-	def makeDone(self, username):
-		self.found["done"].append(username)
-		self.found["accounts"].remove(username)
-
-	def getTags(self):
-		return self.search["tags"]
-
-	def getAccList(self):
-		return 0
-
+		print('c:\dev\instapy\data\\tags_and_accounts.txt')
+		with open('c:\dev\instapy\data\\tags_and_accounts.txt') as file, open('c:\dev\instapy\data\\found_accounts.txt') as found:
+    
+			self.searchAccounts = []
+			for line in file:
+				self.searchAccounts.append(line)
+			
+			self.foundAccounts = []
+			for line in found:
+				self.foundAccounts.append(line)
+    
 	def getAccounts(self):
-		# print(self.search["accounts"])
-		return self.found["accounts"]
+		return self.foundAccounts
+
+	def addFound(self, element: str):
+		if element not in self.foundAccounts:
+			self.foundAccounts.append(element)
+			print('found new account: {accountName}'.format(accountName = element))
+   
+   
+	def makeDone(self, element: str):
+		self.foundAccounts.remove(element)
+  
+	def save(self):
+		with open('c:\dev\instapy\data\\found_accounts.txt', 'w+') as found:
+			found.writelines(self.foundAccounts)
+		pass
