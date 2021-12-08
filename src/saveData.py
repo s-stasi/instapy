@@ -1,5 +1,5 @@
 from threading import Lock
-import os
+
 class Singleton(type):
   _instances = {}
   _lock: Lock = Lock()
@@ -16,8 +16,7 @@ class BotData(metaclass = Singleton):
 	searchAccounts = []
   
 	def __init__(self):
-		print('c:\dev\instapy\data\\tags_and_accounts.txt')
-		with open('c:\dev\instapy\data\\tags_and_accounts.txt') as file, open('c:\dev\instapy\data\\found_accounts.txt') as found:
+		with open('c:\dev\instapy\data\\tags_and_accounts.txt', 'r') as file, open('c:\dev\instapy\data\\found_accounts.txt', 'r') as found:
     
 			self.searchAccounts = []
 			for line in file:
@@ -35,11 +34,21 @@ class BotData(metaclass = Singleton):
 			self.foundAccounts.append(element)
 			print('found new account: {accountName}'.format(accountName = element))
    
-   
+	def scraped(self, account, save=True):
+		self.searchAccounts.remove(account)
+		if not save:
+			return
+
+		with open('c:\dev\instapy\data\\tags_and_accounts.txt', 'w') as file:
+			file.writelines(self.searchAccounts)
+
 	def makeDone(self, element: str):
 		self.foundAccounts.remove(element)
   
-	def save(self):
-		with open('c:\dev\instapy\data\\found_accounts.txt', 'w+') as found:
+	def saveFound(self):
+		with open('c:\dev\instapy\data\\found_accounts.txt', 'w') as found:
 			found.writelines(self.foundAccounts)
 		pass
+
+	def toScrape(self):
+		return self.searchAccounts

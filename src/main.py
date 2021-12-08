@@ -8,11 +8,9 @@ def makeList():
 
 
 def sendMessages():
-  bot = Bot('cricetonzi', 'samuele222002')
-  data = BotData()
-  for i in data.getAccounts():
-    bot.sendMessage(i, "")
+  message='placeholder'
+  bot = Bot()
+  bot.sendMessages(delay=1, message=message)
   
 makeListThread = Thread(target = makeList)
 makeListThread.start()
-  

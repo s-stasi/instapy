@@ -1,11 +1,11 @@
 from getpass import getpass
+import time
 from saveData import BotData
 from instaclient import InstaClient
 from instaclient.errors import *
 
 USERNAME = 'cricetonzi'
 PASSWORD = 'samuele222002'
-
 
 class Bot:
 	PATH = 'c:\dev\instapy\\bin\chromedriver.exe'
@@ -27,28 +27,23 @@ class Bot:
 						code = input('Enter the security code that was sent to you via SMS: ')
 				self.client.input_security_code(code)
 
-	def sendMessage(self, username: str, message: str):
-		pass
-
-	def searchHashtag(self, hashtag: str):
-		pass
-
-	def searchUser(self, username: str):
-		pass
-
-	def getFollowednumber(self):
-		pass
 
 	def addFollowedToList(self):
-		followers = self.client.get_following(user='nascecresceignora', count=500)
+		for account in self.data.toScrape():
+    
+			followers = self.client.get_following(user=account, count=500)
+			
+			for i in followers[0]:
+				self.data.addFound(i.username +'\n')
 		
-		for i in followers[0]:
-			self.data.addFound(i.username +'\n')
-   
-		self.data.save()
+			self.data.saveFound()
+			self.data.scraped(account)
 
+	def sendMessages(self, delay=1, message='placeholder'):
+		for user in self.data.getAccounts():
+			self.client.send_dm(user, message)
 
-	def addFollowersToList(self):
-		pass
-
-		self.scrape_followers()
+			time.sleep(60 * delay)
+			self.data.makeDone(user)
+			self.data.saveFound()
+			print('Message sent to {acc}'.format(acc=user))
